@@ -1,3 +1,6 @@
+[submodule "slic3r"]
+	path = slic3r
+	url = git@github.com:dob71/Slic3r.git
 [submodule "x2sw"]
 	path = x2sw
 	url = git@github.com:dob71/x2sw.git
