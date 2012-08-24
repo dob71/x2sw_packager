@@ -3,7 +3,8 @@
 set X2SW_PROJ_DIR="%~dp0"
 if not defined PATH_TO_PERL_INSTALL set PATH_TO_PERL_INSTALL=D:\CitrusPerl
 if not defined PATH_TO_CAVACONSOLE set PATH_TO_CAVACONSOLE="C:\Program Files\Cava Packager 2.0\bin"
-rem if not defined PATH_TO_CYGWIN set PATH_TO_CYGWIN="C:\cygwin\bin"
+if not defined PATH_TO_PYTHON set PATH_TO_PYTHON=C:\Python27
+if not defined PATH_TO_PYINSTALLER set PATH_TO_PYINSTALLER=D:\pyinstaller-2.0
 
 if exist %PATH_TO_PERL_INSTALL%\bin\citrusvars.bat goto OK1
 echo Unable to find Citrus Perl environment setup script!
@@ -22,8 +23,8 @@ echo Unable to substitute drive S: to the path to x2sw project!
 goto FAILURE
 
 :OK3
-call %PATH_TO_PERL_INSTALL%\bin\citrusvars.bat
-goto OK4
+rem call %PATH_TO_PERL_INSTALL%\bin\citrusvars.bat
+goto OK5
 
 echo Starting the slick3r build sript.
 cd %X2SW_PROJ_DIR%\slic3r
@@ -42,7 +43,16 @@ echo Cava packager build has failed!
 goto FAILURE
 
 :OK5
+echo Starting x2sw build
+cd %X2SW_PROJ_DIR%\x2sw_build
+%PATH_TO_PYTHON%\python.exe compile.py
+if not errorlevel 1 goto OK6
+echo Compilation of the Python files has failed!
+goto FAILURE
 
+:OK6
+echo Building x2sw binary distribution...
+%PATH_TO_PYTHON%\python.exe %PATH_TO_PYINSTALLER%/pyinstaller.py ./x2sw.spec
 
 :FAILURE
 subst P: /D > :NULL
