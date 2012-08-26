@@ -14,6 +14,8 @@ if sys.platform.startswith('win'):
     tclTree2 = Tree(os.path.join(pathToMyPython, 'tcl', 'tk8.5'), prefix='tcl/tk8.5')
     dllsPath = os.path.join(pathToMyPython, 'DLLs')
     dlls = [ (os.path.join('DLLs',f), os.path.join(dllsPath,f), 'DATA') for f in ('_tkinter.pyd','tcl85.dll','tk85.dll') ]
+    slic3rDir = Tree('../slic3r_win/release', 'slic3r')
+    driversDir = Tree('../drivers/win', 'drivers')
 elif sys.platform.startswith('linux'):
     print "Not yet supported architecture!"
     exit(-1)
@@ -38,10 +40,18 @@ libNamesTk = [(os.path.join('Lib','lib-tk',f),os.path.join(tlibPath,f),'DATA') f
 
 
 localeDir = Tree('../x2sw/locale','locale')
-profilesDir = Tree('../x2sw/.x2sw', '.x2sw')
 imagesDir = Tree('../x2sw/images', 'images')
 sfDir = Tree('../x2sw/skeinforge', 'skeinforge')
 pfaceIcon = '../x2sw/P-face.ico'
+platerIcon = '../x2sw/plater.ico'
+
+# Profiles are included with repo's real git folder
+# .git file in submodule points to that real repo git folder
+profiles = Tree('../x2sw_profiles', '.x2sw', '.git')
+profilesGitDir = '../x2sw_profiles/.git'
+if os.path.isfile(profilesGitDir):
+    profilesGitDir  = os.path.join('..','x2sw_profiles',open(profilesGitDir).readline())
+profilesGit = Tree(profilesGitDir, '.x2sw/.git')
 
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
@@ -67,7 +77,10 @@ coll = COLLECT(exe,
           tclTree2,
           localeDir,
           imagesDir,
-          [(os.path.basename(pfaceIcon), pfaceIcon, 'DATA')],
+          [(os.path.basename(pfaceIcon), pfaceIcon, 'DATA'),(os.path.basename(platerIcon), platerIcon, 'DATA')],
           sfDir,
-          profilesDir,
+          slic3rDir,
+          profiles,
+          profilesGit,
+          driversDir,
           name='dist/x2swbin')

@@ -4,3 +4,6 @@
 [submodule "x2sw"]
 	path = x2sw
 	url = git@github.com:dob71/x2swn.git
+[submodule "x2sw_profiles"]
+	path = x2sw_profiles
+	url = http://github.com/dob71/x2sw_profiles.git
