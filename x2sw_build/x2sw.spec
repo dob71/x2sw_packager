@@ -14,7 +14,11 @@ if sys.platform.startswith('win'):
     tclTree2 = Tree(os.path.join(pathToMyPython, 'tcl', 'tk8.5'), prefix='tcl/tk8.5')
     dllsPath = os.path.join(pathToMyPython, 'DLLs')
     dlls = [ (os.path.join('DLLs',f), os.path.join(dllsPath,f), 'DATA') for f in ('_tkinter.pyd','tcl85.dll','tk85.dll') ]
-    slic3rDir = Tree('../slic3r_win/release', 'slic3r')
+    slic3rDll = Tree('../slic3r_win/release/slic3r/dll', 'slic3r/dll')
+    slic3rLib = Tree('../slic3r_win/release/slic3r/lib', 'slic3r/lib')
+    slic3rRt = Tree('../slic3r_win/release/slic3r/cpfworkrt', 'slic3r/cpfworkrt')
+    slic3rRes = Tree('../slic3r_win/release/slic3r/user', 'slic3r/var')
+    slic3rExe = '../slic3r_win/release/slic3r/slic3r.exe'
     driversDir = Tree('../drivers/win', 'drivers')
 elif sys.platform.startswith('linux'):
     print "Not yet supported architecture!"
@@ -44,14 +48,18 @@ imagesDir = Tree('../x2sw/images', 'images')
 sfDir = Tree('../x2sw/skeinforge', 'skeinforge')
 pfaceIcon = '../x2sw/P-face.ico'
 platerIcon = '../x2sw/plater.ico'
+versionFile = '../x2sw/version.txt'
 
 # Profiles are included with repo's real git folder
 # .git file in submodule points to that real repo git folder
-profiles = Tree('../x2sw_profiles', '.x2sw', '.git')
+profiles = Tree('../x2sw_profiles', '.x2sw', excludes=['.git'])
 profilesGitDir = '../x2sw_profiles/.git'
 if os.path.isfile(profilesGitDir):
-    profilesGitDir  = os.path.join('..','x2sw_profiles',open(profilesGitDir).readline())
-profilesGit = Tree(profilesGitDir, '.x2sw/.git')
+    for line in open(profilesGitDir,'r'):
+       print 'Read line: {}\n'.format(line)
+       if line.split(':')[0] == 'gitdir': profilesGitDir = line.split(' ')[1].lstrip(' ').rstrip('\n')
+print 'The git path is: {}\n'.format(profilesGitDir)
+profilesGit = Tree(profilesGitDir, os.path.join('.x2sw','.git'))
 
 pyz = PYZ(a.pure)
 exe = EXE(pyz,
@@ -62,7 +70,7 @@ exe = EXE(pyz,
           strip=False,
           upx=False,
           icon=pfaceIcon,
-          console=1 )
+          console=0 )
 
 coll = COLLECT(exe,                    
           a.binaries, 
@@ -77,9 +85,13 @@ coll = COLLECT(exe,
           tclTree2,
           localeDir,
           imagesDir,
-          [(os.path.basename(pfaceIcon), pfaceIcon, 'DATA'),(os.path.basename(platerIcon), platerIcon, 'DATA')],
+          [(os.path.basename(pfaceIcon), pfaceIcon, 'DATA'),(os.path.basename(platerIcon), platerIcon, 'DATA'),(os.path.basename(versionFile), versionFile, 'DATA')],
           sfDir,
-          slic3rDir,
+          slic3rDll,
+          slic3rLib,
+          slic3rRt,
+          slic3rRes,
+          [(os.path.join('slic3r',os.path.basename(slic3rExe)), slic3rExe, 'BINARY')],
           profiles,
           profilesGit,
           driversDir,
