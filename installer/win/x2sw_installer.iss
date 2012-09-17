@@ -12,7 +12,7 @@
 #sub EmitInfComponent
   #define FileName FindGetFileName(FindHandle)
   #define DrvName Copy(FileName, 1, Pos('.inf',LowerCase(FileName))-1)
-  #emit 'Name: "drv'+str(Count)+'"; Description: "'+DrvName+' Driver"; Types: full custom'
+  #emit 'Name: "drv'+str(Count)+'"; Description: "'+DrvName+' Driver"; Types: full custom; Flags: dontinheritcheck'
   #expr DrvComponentList += ' drv' + str(Count)
 #endsub
 
@@ -94,8 +94,8 @@ Name: "{group}\Skeinforge"; Filename: "{app}\python.exe"; Parameters: "skeinforg
 Name: "{commondesktop}\Pronterface"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\drivers\dpinst.exe"; Description: "Arduino 0.23 drivers setup"; Parameters: "/LM /SA /S"; WorkingDir: "{app}\drivers"; Components: {#DrvComponentList}; StatusMsg: "Installing Arduino 0.23 drivers"
+Filename: "{app}\drivers\dpinst.exe"; Description: "Arduino 0.23 drivers setup"; Parameters: "/LM /SA /SW"; WorkingDir: "{app}\drivers"; Components: {#DrvComponentList}; StatusMsg: "Installing Arduino 0.23 drivers"
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-Filename: "{app}\drivers\uninstall.bat"; WorkingDir: "{app}\drivers"; Components: {#DrvComponentList}; StatusMsg: "Removing Arduino 0.23 drivers"; Flags: shellexec waituntilterminated
+Filename: "{app}\drivers\uninstall.bat"; WorkingDir: "{app}\drivers"; Components: {#DrvComponentList}; StatusMsg: "Removing Arduino 0.23 drivers"; Flags: shellexec waituntilterminated runminimized

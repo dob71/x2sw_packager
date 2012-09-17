@@ -48,6 +48,8 @@ imagesDir = Tree('../x2sw/images', 'images')
 sfDir = Tree('../x2sw/skeinforge', 'skeinforge')
 pfaceIcon = '../x2sw/P-face.ico'
 platerIcon = '../x2sw/plater.ico'
+profilerIcon = '../x2sw/x2.ico'
+pronsoleIcon = '../x2sw/pronsole.ico'
 versionFile = '../x2sw/version.txt'
 
 # Profiles are included with repo's real git folder
@@ -66,7 +68,7 @@ exe = EXE(pyz,
           a.scripts,
           exclude_binaries=1,
           name='dist/pronterface.exe',
-          debug=1,
+          debug=0,
           strip=False,
           upx=False,
           icon=pfaceIcon,
@@ -85,7 +87,11 @@ coll = COLLECT(exe,
           tclTree2,
           localeDir,
           imagesDir,
-          [(os.path.basename(pfaceIcon), pfaceIcon, 'DATA'),(os.path.basename(platerIcon), platerIcon, 'DATA'),(os.path.basename(versionFile), versionFile, 'DATA')],
+          [(os.path.basename(pfaceIcon), pfaceIcon, 'DATA'),\
+           (os.path.basename(platerIcon), platerIcon, 'DATA'),\
+           (os.path.basename(platerIcon), profilerIcon, 'DATA'),\
+           (os.path.basename(platerIcon), pronsoleIcon, 'DATA'),\
+           (os.path.basename(versionFile), versionFile, 'DATA')],
           sfDir,
           slic3rDll,
           slic3rLib,
