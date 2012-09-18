@@ -12,7 +12,7 @@
 #sub EmitInfComponent
   #define FileName FindGetFileName(FindHandle)
   #define DrvName Copy(FileName, 1, Pos('.inf',LowerCase(FileName))-1)
-  #emit 'Name: "drv'+str(Count)+'"; Description: "'+DrvName+' Driver"; Types: full custom; Flags: dontinheritcheck'
+  #emit 'Name: "drv'+str(Count)+'"; Description: "'+DrvName+' Driver"; Types: custom'
   #expr DrvComponentList += ' drv' + str(Count)
 #endsub
 
@@ -52,7 +52,7 @@ OutputBaseFilename=x2sw_win_{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 SetupIconFile="{#MyProjectDir}\installer\win\setup.ico"
-UninstallDisplayIcon="{#MyProjectDir}\installer\win\setup.ico"
+UninstallDisplayIcon="{app}\x2.ico"
 UsePreviousLanguage=no
 
 [Components]

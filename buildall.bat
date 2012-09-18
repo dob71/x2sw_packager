@@ -66,6 +66,7 @@ goto FAILURE
 :OK6
 IF "%SKIP6%"=="1" goto OK7
 echo Building x2sw binary distribution...
+del /F /Q /S "%X2SW_PROJ_DIR%\x2sw_build\dist" > :NULL
 %PATH_TO_PYTHON%\python.exe %PATH_TO_PYINSTALLER%/pyinstaller.py ./x2sw.spec
 if not errorlevel 1 goto OK7
 echo 6: Building the distribution package tree has failed!

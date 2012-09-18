@@ -7,8 +7,14 @@ a = Analysis(['../x2sw/pronterface.py','../x2sw/skeinforge/fabmetheus_utilities/
 # %-() let's just add skeinforge manually 
 
 pathToMyPython = os.path.dirname(sys.executable)
+pathToInterpreter = sys.executable
+pathToWinInterpreter = sys.executable
 
 if sys.platform.startswith('win'):
+    pathToWinInterpreter = pathToInterpreter[:-4] + 'w.exe'
+    if not os.path.exists(pathToWinInterpreter):
+        print "Python GUI executable is required, not found: " + pathToWinInterpreter
+        exit(-1)
     libPath = os.path.join(pathToMyPython, 'Lib')
     tclTree1 = Tree(os.path.join(pathToMyPython, 'tcl', 'tcl8.5'), prefix='tcl/tcl8.5')
     tclTree2 = Tree(os.path.join(pathToMyPython, 'tcl', 'tk8.5'), prefix='tcl/tk8.5')
@@ -76,7 +82,7 @@ exe = EXE(pyz,
 
 coll = COLLECT(exe,                    
           a.binaries, 
-          [(os.path.basename(sys.executable), sys.executable, 'BINARY')],
+          [(os.path.basename(pathToInterpreter), pathToWinInterpreter, 'BINARY')],
           a.zipfiles, 
           a.datas, 
           libNamesRoot,
@@ -89,8 +95,8 @@ coll = COLLECT(exe,
           imagesDir,
           [(os.path.basename(pfaceIcon), pfaceIcon, 'DATA'),\
            (os.path.basename(platerIcon), platerIcon, 'DATA'),\
-           (os.path.basename(platerIcon), profilerIcon, 'DATA'),\
-           (os.path.basename(platerIcon), pronsoleIcon, 'DATA'),\
+           (os.path.basename(profilerIcon), profilerIcon, 'DATA'),\
+           (os.path.basename(pronsoleIcon), pronsoleIcon, 'DATA'),\
            (os.path.basename(versionFile), versionFile, 'DATA')],
           sfDir,
           slic3rDll,
