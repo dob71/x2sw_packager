@@ -1,0 +1,41 @@
+#!/bin/sh
+
+PRE_CWD=`pwd`
+cd `dirname $0`/x2swbin
+PYTHONHOME=`pwd`/lib
+PYTHONPATH=$PYTHONHOME:$PYTHONHOME/lib-tk
+
+PREFIX=nohup
+SUFFIX='</dev/null >/dev/null &'
+TOSTART=$1
+shift
+if [ "$TOSTART" == "console" ]; then 
+  TOSTART=$1
+  shift
+  PREFIX=
+  SUFFIX=
+fi
+if [ "$TOSTART" == "" ]; then
+  TOSTART=pronterface
+fi
+OPTIONS=$*
+
+case $TOSTART in
+  pronterface)
+    CMD="$PREFIX ./$TOSTART $OPTIONS $SUFFIX"
+    ;;
+  slic3r)
+    CMD="$PREFIX ./slic3r/$TOSTART $OPTIONS $SUFFIX"
+    ;;
+  skeinforge)
+    CMD="$PREFIX ./python ./skeinforge/skeinforge_application/skeinforge.py $OPTIONS $SUFFIX"
+    ;;
+  *)
+    CMD="echo \"Unsupported command: $TOSTART\""
+    ;;
+esac
+
+eval $CMD
+
+cd $PRE_CWD > /dev/null
+
