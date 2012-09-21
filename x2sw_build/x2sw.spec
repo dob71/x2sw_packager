@@ -27,7 +27,7 @@ if sys.platform.startswith('win'):
     slic3rRt = Tree('../slic3r_win/release/slic3r/cpfworkrt', 'slic3r/cpfworkrt')
     slic3rRes = Tree('../slic3r_win/release/slic3r/user', 'slic3r/var')
     slic3rExe = '../slic3r_win/release/slic3r/slic3r.exe'
-    slic3rBin = [(os.path.join('slic3r', os.path.basename(slic3rExe)), slic3rExe, 'BINARY')],
+    slic3rBin = [(os.path.join('slic3r', os.path.basename(slic3rExe)), slic3rExe, 'BINARY')]
     driversDir = Tree('../drivers/win', 'drivers')
     libNamesRoot = [(os.path.join('Lib',f),os.path.join(libPath,f),'DATA') for f in os.listdir(libPath)
                     if (not os.path.isdir(f)
