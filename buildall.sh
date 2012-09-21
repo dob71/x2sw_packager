@@ -1,5 +1,6 @@
 #!/bin/bash
 
+MY_CWD=`pwd`
 X2SW_PROJ_DIR=$(dirname $(readlink -f $0))
 
 if [ "$PATH_TO_PERL_INSTALL" == "" ]; then 
@@ -11,17 +12,11 @@ if [ "$PATH_TO_CAVACONSOLE" == "" ]; then
   PATH_TO_CAVACONSOLE=~/CavaPackager/bin
 fi
 
-# We need the path to the libs here (used to bundle skeinforge w/ Printrun)
-if [ "$PATH_TO_PYTHON" == "" ]; then
-  PATH_TO_PYTHON=/usr/lib/python2.6
-fi
-
 if [ "$PATH_TO_PYINSTALLER" == "" ]; then
   PATH_TO_PYINSTALLER=/usr/local/bin/pyinstaller
 fi
 
 # error handling
-MY_CWD=`pwd`
 trap onexit 1 2 3 15 ERR
 function onexit() {
     local exit_status=${1:-$?}
@@ -70,11 +65,9 @@ fi
 # Step 6, buid the binary distribution file tree
 if [[ ! $* =~ (^| )6($| ) ]]; then 
    echo "Building x2sw binary distribution."
-   #! rm -Rf "$X2SW_PROJ_DIR/x2sw_build/dist"
    cd "$X2SW_PROJ_DIR/x2sw_build"
    "$PATH_TO_PYINSTALLER/pyinstaller.py" ./x2sw.spec
    ln -s bin/slic3r dist/x2sw/x2swbin/slic3r/slic3r
-   #ln -s ../../lib/_tkinter.so dist/x2sw/x2swbin/skeinforge/skeinforge_application
 fi
 
 echo Adding submodule information to the version file
