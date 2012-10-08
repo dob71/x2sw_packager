@@ -60,7 +60,8 @@ elif sys.platform.startswith('linux'):
     manualLibs = [libPath + '/lib-dynload/_tkinter.so']
     for lib in manualLibs:
         for (t1, t2) in PyInstaller.bindepend.selectImports(lib):
-            dlls.append((os.path.join('lib',t1),t2,'DATA'))
+            dlls.append((os.path.join('lib',t1), t2, 'DATA'))
+        dlls.append((os.path.join('lib', os.path.basename(lib)), lib, 'DATA'))
     # Add TCL/TK deps
     #import imp
     #tkhook = imp.find_module("PyInstaller/hooks/hook-_tkinter")
