@@ -32,6 +32,10 @@ slic3r_win/cava20-logs
 slic3r_win/cava20-temp
 slic3r_win/installer
 slic3r_win/release
+slic3r_linux/cava20-logs
+slic3r_linux/cava20-temp
+slic3r_linux/installer
+slic3r_linux/release
 
 # x2sw
 x2sw_build/build

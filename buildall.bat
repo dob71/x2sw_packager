@@ -74,7 +74,8 @@ goto FAILURE
 
 echo Adding submodule information to the version file
 pushd "%X2SW_PROJ_DIR%"
-git submodule >> x2sw_build\dist\version.txt
+copy /Y .\version.txt x2sw_build\dist\x2sw\version.txt
+git submodule >> x2sw_build\dist\x2sw\version.txt
 popd
 
 :OK7
@@ -91,7 +92,7 @@ goto FAILURE
 IF "%SKIP8%"=="1" goto OK9
 echo Binary distribution zip
 cd "%X2SW_PROJ_DIR%\x2sw_build\dist"
-FOR /F "tokens=*" %%a IN (..\..\x2sw\version.txt) do set VER=%%a
+FOR /F "tokens=*" %%a IN (..\..\version.txt) do set VER=%%a
 zip -r "%X2SW_PROJ_DIR%\out\win\x2sw_%VER%.zip" x2swbin
 if not errorlevel 1 goto OK9
 echo 8: Failed to create the package zip archive!
@@ -101,7 +102,7 @@ goto FAILURE
 IF "%SKIP9%"=="1" goto OK10
 echo Building installer
 cd "%X2SW_PROJ_DIR%"
-FOR /F "tokens=*" %%a IN (.\x2sw\version.txt) do set VER=%%a
+FOR /F "tokens=*" %%a IN (.\version.txt) do set VER=%%a
 %PATH_TO_INNOSETUP%\iscc /Q /O"%X2SW_PROJ_DIR%\out\win" /F"x2sw_win_%VER%" "%X2SW_PROJ_DIR%\installer\win\x2sw_installer.iss"
 if not errorlevel 1 goto OK10
 echo Failed to create the installer package!

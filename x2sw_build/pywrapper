@@ -1,0 +1,13 @@
+#!/bin/bash
+
+PRE_CWD=`pwd`
+cd `dirname $0`
+export PYTHONHOME=`pwd`/lib
+export PYTHONPATH=$PYTHONHOME:$PYTHONHOME/lib-tk
+export PATH=`pwd`:$PYTHONHOME:$PYTHONHOME/lib-tk:$PATH
+export LD_LIBRARY_PATH=$PYTHONHOME:$PYTHONHOME/lib-tk:$LD_LIBRARY_PATH
+export TCL_LIBRARY=$PYTHONHOME/tcl
+export TK_LIBRARY=$PYTHONHOME/tk
+cd $PRE_CWD
+
+pythonx -S $*

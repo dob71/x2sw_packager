@@ -72,7 +72,9 @@ fi
 
 echo Adding submodule information to the version file
 cd "$X2SW_PROJ_DIR"
-git submodule >> x2sw_build/dist/version.txt
+# Use packager's version file
+cp -f ./version.txt x2sw_build/dist/x2sw/version.txt
+git submodule >> x2sw_build/dist/x2sw/version.txt
 
 # Step 7, building the binary package (first move the files around
 # and create symlinks to make it look clean and simple).
@@ -85,9 +87,13 @@ if [[ ! $* =~ (^| )6($| ) ]]; then
       rm -Rf "$X2SW_PROJ_DIR/out/linux"
    fi
    mkdir "$X2SW_PROJ_DIR/out/linux"
-   VER=`cat ./x2sw/version.txt`
+   VER=`cat ./version.txt`
    cd "$X2SW_PROJ_DIR/x2sw_build/dist"
    cp "$X2SW_PROJ_DIR/x2sw_build/x2start" ./x2sw/
+   # replace real python with a wrapper
+   mv ./x2sw/x2swbin/python ./x2sw/x2swbin/pythonx
+   cp "$X2SW_PROJ_DIR/x2sw_build/pywrapper" ./x2sw/x2swbin/python
+   # make the tarball
    tar -czvf "$X2SW_PROJ_DIR/out/linux/x2sw_$VER.tgz" x2sw
 fi
 

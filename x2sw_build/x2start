@@ -1,12 +1,12 @@
-#!/bin/sh
+#!/bin/bash
 
 PRE_CWD=`pwd`
 cd `dirname $0`/x2swbin
-PYTHONHOME=`pwd`/lib
-PYTHONPATH=$PYTHONHOME:$PYTHONHOME/lib-tk
+BINDIR=`pwd`
+export PATH=$BINDIR:$BINDIR/lib:$PATH
 
 PREFIX=nohup
-SUFFIX='</dev/null >/dev/null &'
+SUFFIX='</dev/null 2>/dev/null 1>&2 &'
 TOSTART=$1
 shift
 if [ "$TOSTART" == "console" ]; then 
