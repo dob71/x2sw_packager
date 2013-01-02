@@ -1,5 +1,6 @@
 #!/bin/bash
 
+unset CMD
 PRE_CWD=`pwd`
 cd `dirname $0`/x2swbin
 BINDIR=`pwd`
@@ -31,7 +32,12 @@ case $TOSTART in
     CMD="$PREFIX ./python ./skeinforge/skeinforge_application/skeinforge.py $OPTIONS $SUFFIX"
     ;;
   *)
-    CMD="echo \"Unsupported command: $TOSTART\""
+    SCRIPT_NAME=`basename $0`
+    echo "Usage: $SCRIPT_NAME [console] [pronterface|slic3r|skeinforge] ..."
+    echo "The script invokes the X2SW software bundle components."
+    echo "If \"console\" is specified the console stays attached and the output is not supressed."
+    echo "The options to pass to the specified subcommand application can be added at the end of the command line."
+    echo "If run without paramaters \"pronterface\" is invoked."
     ;;
 esac
 
