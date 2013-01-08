@@ -70,15 +70,28 @@ if [[ ! $* =~ (^| )6($| ) ]]; then
    ln -s bin/slic3r dist/x2sw/x2swbin/slic3r/slic3r
 fi
 
+# Step 7, add Pango modules ang configuration files
+if [[ ! $* =~ (^| )7($| ) ]]; then 
+   echo "Adding Pango."
+   cd "$X2SW_PROJ_DIR/x2sw_build/dist/x2sw/x2swbin"
+   mkdir -p ./pango/modules
+   echo "[Pango]" > ./pango/pangorc
+   echo "ModuleFiles = ./pango/pango.modules" >> ./pango/pangorc
+   pango-querymodules | sed -e "s/.*\/\([^\/][^\/]*\.so\)\s\(.*\)/\.\/pango\/modules\/\1 \2/" > ./pango/pango.modules
+   for f in `pango-querymodules | sed -e "s/\s*\([^#].*\.so\) .*/\1/"  | grep -Ev "\s*#"`; do
+      cp -f $f ./pango/modules/
+   done
+fi
+
 echo Adding submodule information to the version file
 cd "$X2SW_PROJ_DIR"
 # Use packager's version file
 cp -f ./version.txt x2sw_build/dist/x2sw/version.txt
 git submodule >> x2sw_build/dist/x2sw/version.txt
 
-# Step 7, building the binary package (first move the files around
+# Step 8, building the binary package (first move the files around
 # and create symlinks to make it look clean and simple).
-if [[ ! $* =~ (^| )6($| ) ]]; then 
+if [[ ! $* =~ (^| )8($| ) ]]; then 
    echo Building packages
    if [ ! -e "$X2SW_PROJ_DIR/out" ]; then 
       mkdir "$X2SW_PROJ_DIR/out"
