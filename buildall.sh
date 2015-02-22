@@ -86,7 +86,7 @@ fi
 echo Adding submodule information to the version file
 cd "$X2SW_PROJ_DIR"
 # Use packager's version file
-cp -f ./version.txt x2sw_build/dist/x2sw/version.txt
+cp -f ./x2sw/version.txt x2sw_build/dist/x2sw/version.txt
 git submodule >> x2sw_build/dist/x2sw/version.txt
 
 # Step 8, building the binary package (first move the files around

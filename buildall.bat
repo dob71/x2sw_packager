@@ -74,7 +74,7 @@ goto FAILURE
 
 echo Adding submodule information to the version file
 pushd "%X2SW_PROJ_DIR%"
-copy /Y .\version.txt x2sw_build\dist\x2sw\version.txt
+copy /Y .\x2sw\version.txt x2sw_build\dist\x2sw\version.txt
 git submodule >> x2sw_build\dist\x2sw\version.txt
 popd
 
