@@ -1,5 +1,5 @@
 @echo off
-echo Installing Arduino v0.23 drivers...
+echo Installing Arduino v1.0.6 drivers...
 set DPINST=DPInst.exe
 IF "%PROCESSOR_ARCHITECTURE%"=="" set PROCESSOR_ARCHITECTURE=x86
 pushd "%~dp0"

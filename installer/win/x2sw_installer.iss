@@ -77,6 +77,7 @@ Source: "x2sw_build\dist\x2swbin\*"; DestDir: "{app}"; Excludes: "\drivers"; Com
 Source: "drivers\win\dpinst_x86.exe"; DestDir: "{app}\drivers"; Components: {#DrvComponentList}; DestName: dpinst.exe; Check: not IsWin64; Flags: ignoreversion
 Source: "drivers\win\dpinst_x64.exe"; DestDir: "{app}\drivers"; Components: {#DrvComponentList}; DestName: dpinst.exe; Check: IsWin64; Flags: ignoreversion
 Source: "drivers\win\*.bat"; DestDir: "{app}\drivers"; Components: {#DrvComponentList}; Flags: ignoreversion
+Source: "drivers\win\*.cat"; DestDir: "{app}\drivers"; Components: {#DrvComponentList}; Flags: ignoreversion
 #for {(Count = 1, FindHandle = FindResult = FindFirst(InfMask, 0)); \
       FindResult; \
       (Count++, FindResult = FindNext(FindHandle))} EmitInfFileEntry
@@ -94,8 +95,8 @@ Name: "{group}\Skeinforge"; Filename: "{app}\python.exe"; Parameters: "skeinforg
 Name: "{commondesktop}\Pronterface"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-Filename: "{app}\drivers\dpinst.exe"; Description: "Arduino 0.23 drivers setup"; Parameters: "/LM /SA /SW"; WorkingDir: "{app}\drivers"; Components: {#DrvComponentList}; StatusMsg: "Installing Arduino 0.23 drivers"
+Filename: "{app}\drivers\dpinst.exe"; Description: "Arduino drivers setup"; Parameters: "/LM /SA /SW"; WorkingDir: "{app}\drivers"; Components: {#DrvComponentList}; StatusMsg: "Installing Arduino drivers"
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-Filename: "{app}\drivers\uninstall.bat"; WorkingDir: "{app}\drivers"; Components: {#DrvComponentList}; StatusMsg: "Removing Arduino 0.23 drivers"; Flags: shellexec waituntilterminated runminimized
+Filename: "{app}\drivers\uninstall.bat"; WorkingDir: "{app}\drivers"; Components: {#DrvComponentList}; StatusMsg: "Removing Arduino drivers"; Flags: shellexec waituntilterminated runminimized

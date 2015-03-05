@@ -90,11 +90,14 @@ else:
 localeDir = Tree('../x2sw/locale','locale')
 imagesDir = Tree('../x2sw/images', 'images')
 sfDir = Tree('../x2sw/skeinforge', 'skeinforge')
-pfaceIcon = '../x2sw/P-face.ico'
+pfaceIcon = '../x2sw/pronterface.ico'
+pfacePng = '../x2sw/pronterface.png'
 platerIcon = '../x2sw/plater.ico'
+platerPng = '../x2sw/plater.png'
 profilerIcon = '../x2sw/x2.ico'
 pronsoleIcon = '../x2sw/pronsole.ico'
-versionFile = '../version.txt'
+pronsolePng = '../x2sw/pronsole.png'
+versionFile = '../x2sw/version.txt'
 
 # Profiles are included with repo's real git folder
 # .git file in submodule points to that real repo git folder
@@ -131,11 +134,14 @@ coll = COLLECT(exe,
           tclTree2,
           localeDir,
           imagesDir,
-          [(os.path.basename(pfaceIcon), pfaceIcon, 'DATA'),\
-           (os.path.basename(platerIcon), platerIcon, 'DATA'),\
+          [(os.path.basename(pfaceIcon),    pfaceIcon,    'DATA'),\
+           (os.path.basename(platerIcon),   platerIcon,   'DATA'),\
            (os.path.basename(profilerIcon), profilerIcon, 'DATA'),\
            (os.path.basename(pronsoleIcon), pronsoleIcon, 'DATA'),\
-           (os.path.basename(versionFile), versionFile, 'DATA')],
+           (os.path.basename(platerPng),    platerPng,    'DATA'),\
+           (os.path.basename(pfacePng),     pfacePng,     'DATA'),\
+           (os.path.basename(pronsolePng),  pronsolePng,  'DATA'),\
+           (os.path.basename(versionFile),  versionFile,  'DATA')],
           sfDir,
           slic3rDll,
           slic3rLib,

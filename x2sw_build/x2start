@@ -6,7 +6,7 @@ cd `dirname $0`/x2swbin
 BINDIR=`pwd`
 export PATH=$BINDIR:$BINDIR/lib:$PATH
 
-# Pango modules are bundledi (for fonts rendering), have to use custom RC that points to them
+# Pango modules are bundled (for fonts rendering), have to use custom RC that points to them
 export PANGO_RC_FILE=./pango/pangorc
 
 PREFIX=nohup
