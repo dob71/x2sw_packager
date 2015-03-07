@@ -12,7 +12,7 @@
 #sub EmitInfComponent
   #define FileName FindGetFileName(FindHandle)
   #define DrvName Copy(FileName, 1, Pos('.inf',LowerCase(FileName))-1)
-  #emit 'Name: "drv'+str(Count)+'"; Description: "'+DrvName+' Driver"; Types: custom'
+  #emit 'Name: "drv'+str(Count)+'"; Description: "'+DrvName+' Driver"; Types: full'
   #expr DrvComponentList += ' drv' + str(Count)
 #endsub
 
