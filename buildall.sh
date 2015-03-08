@@ -58,7 +58,9 @@ fi
 # Step 5, pre-compile python code
 if [[ ! $* =~ (^| )5($| ) ]]; then 
    echo "Starting Pronterface build."
-   cd "$X2SW_PROJ_DIR/x2sw_build"
+   cd "$X2SW_PROJ_DIR"
+   python setup.py build_ext --inplace
+   cd "x2sw_build"
    python compile.py
 fi
 

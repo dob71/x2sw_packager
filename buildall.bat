@@ -59,7 +59,13 @@ goto FAILURE
 :OK5
 IF "%SKIP5%"=="1" goto OK6
 echo Starting Pronterface build
+cd "%X2SW_PROJ_DIR%
+%PATH_TO_PYTHON%\python.exe setup.py build_ext --inplace
 cd "%X2SW_PROJ_DIR%\x2sw_build"
+if not errorlevel 1 goto OK5_CONT
+echo 5: Compilation of the gcoder_line extension has failed!
+goto FAILURE
+:OK5_CONT
 %PATH_TO_PYTHON%\python.exe compile.py
 if not errorlevel 1 goto OK6
 echo 5: Compilation of the Python files has failed!
