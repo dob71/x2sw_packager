@@ -58,9 +58,9 @@ fi
 # Step 5, pre-compile python code
 if [[ ! $* =~ (^| )5($| ) ]]; then 
    echo "Starting Pronterface build."
-   cd "$X2SW_PROJ_DIR"
+   cd "$X2SW_PROJ_DIR/x2sw"
    python setup.py build_ext --inplace
-   cd "x2sw_build"
+   cd "$X2SW_PROJ_DIR/x2sw_build"
    python compile.py
 fi
 
@@ -102,7 +102,7 @@ if [[ ! $* =~ (^| )8($| ) ]]; then
       rm -Rf "$X2SW_PROJ_DIR/out/linux"
    fi
    mkdir "$X2SW_PROJ_DIR/out/linux"
-   VER=`cat ./version.txt`
+   VER=`cat ./x2sw/version.txt`
    cd "$X2SW_PROJ_DIR/x2sw_build/dist"
    cp "$X2SW_PROJ_DIR/x2sw_build/x2start" ./x2sw/
    # replace real python with a wrapper
