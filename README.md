@@ -26,10 +26,12 @@ Instructions:
 Notes:
 
 * Cloning
+```
 - After runing "git clone" do "git submodule init" and "git submodule update"
   to populate submodule folders
-
+```
 * Building Slic3r (Ubuntu 12.04)
+```
 - Get CitrusPerl (see http://www.citrusperl.com/), currrently:
   citrusperl-standard-51603-linux-x86-018.tar.gz
 - Unapck to home folder and chown recursively to your user:group
@@ -61,6 +63,8 @@ Notes:
   perl Build.PL --install --gui
    If the above command succeedes you are done, otherwise:
   perl Build.PL --install --wx
-
+```
 * Building Printrun (Ubuntu 12.04)
+```
 TBD   
+```
