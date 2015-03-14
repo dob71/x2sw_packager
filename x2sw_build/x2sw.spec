@@ -51,17 +51,24 @@ elif sys.platform.startswith('linux'):
     slic3rDll = Tree('../slic3r_linux/release/slic3r/dll', 'slic3r/dll')
     slic3rLib = Tree('../slic3r_linux/release/slic3r/lib', 'slic3r/lib')
     slic3rRt = []
-    slic3rRes = Tree('../slic3r_linux/release/slic3r/user', 'slic3r/bin/var')
+    slic3rRes = Tree('../slic3r/var', 'slic3r/bin/var')
     slic3rExe = '../slic3r_linux/release/slic3r/bin/slic3r'
     slic3rBin = [(os.path.join('slic3r', 'bin', os.path.basename(slic3rExe)), slic3rExe, 'BINARY')]
     driversDir = []
     libPath = '/usr/lib/python' + python2dVersion
     dlls = []
-    manualLibs = [libPath + '/lib-dynload/_tkinter.so', libPath + '/lib-dynload/datetime.so', libPath + '/lib-dynload/cmath.so', '/usr/lib/mesa/libGL.so.1', '/usr/lib/libglut.so.3']
-    for lib in manualLibs:
+    manualPLibs = [libPath + '/lib-dynload/_tkinter.so', libPath + '/lib-dynload/datetime.so', libPath + '/lib-dynload/cmath.so', '/usr/lib/mesa/libGL.so.1', '/usr/lib/libglut.so.3']
+    manualBLibs = ['/usr/lib/mesa/libGL.so.1', '/usr/lib/libglut.so.3', '/usr/lib/i386-linux-gnu/mesa/libGL.so.1', '/usr/lib/i386-linux-gnu/libglut.so.3']
+    for lib in manualPLibs:
+        if not os.path.exists(lib):
+            continue
         for (t1, t2) in PyInstaller.bindepend.selectImports(lib):
             dlls.append((os.path.join('lib',t1), t2, 'DATA'))
         dlls.append((os.path.join('lib', os.path.basename(lib)), lib, 'DATA'))
+    for lib in manualBLibs:
+        if not os.path.exists(lib):
+            continue
+        dlls.append((os.path.basename(lib), lib, 'DATA'))
     # Add TCL/TK deps
     #import imp
     #tkhook = imp.find_module("PyInstaller/hooks/hook-_tkinter")

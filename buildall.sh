@@ -14,6 +14,9 @@ fi
 
 if [ "$PATH_TO_PYINSTALLER" == "" ]; then
   PATH_TO_PYINSTALLER=/usr/local/bin/pyinstaller
+  if [ -d "$PATH_TO_PYINSTALLER" ]; then
+    PATH_TO_PYINSTALLER=/usr/local/bin/pyinstaller/pyinstaller.py
+  fi
 fi
 
 # error handling
@@ -52,7 +55,16 @@ fi
 # Step 4, build slic3r binary package
 if [[ ! $* =~ (^| )4($| ) ]]; then 
    echo "Starting the slic3r binaries build."
-   $PATH_TO_CAVACONSOLE/cavaconsole -S -B --project /tmp/S/slic3r_linux
+   while [ 1 ]; do 
+     if $PATH_TO_CAVACONSOLE/cavaconsole -S -B --project /tmp/S/slic3r_linux
+     then
+       break
+     else
+       echo "Cava packager has failed. Use GUI to fix the project file."
+       echo "If this is the first run set scripts path to /tmp/S/slic3r"
+       $PATH_TO_CAVACONSOLE/cavapackager --project /tmp/S/slic3r_linux
+     fi
+   done
 fi
 
 # Step 5, pre-compile python code
@@ -68,8 +80,13 @@ fi
 if [[ ! $* =~ (^| )6($| ) ]]; then 
    echo "Building x2sw binary distribution."
    cd "$X2SW_PROJ_DIR/x2sw_build"
-   "$PATH_TO_PYINSTALLER/pyinstaller.py" ./x2sw.spec
-   ln -s bin/slic3r dist/x2sw/x2swbin/slic3r/slic3r
+   "$PATH_TO_PYINSTALLER" ./x2sw.spec
+   # new pyinstaller skips x2sw folder
+   if [ ! -d ./dist/x2sw ] && [ -d ./dist/x2swbin ]; then
+     mkdir ./dist/x2sw
+     mv ./dist/x2swbin ./dist/x2sw/
+   fi
+   ln -s bin/slic3r ./dist/x2sw/x2swbin/slic3r/slic3r
 fi
 
 # Step 7, add Pango modules ang configuration files
