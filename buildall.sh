@@ -80,10 +80,12 @@ fi
 if [[ ! $* =~ (^| )6($| ) ]]; then 
    echo "Building x2sw binary distribution."
    cd "$X2SW_PROJ_DIR/x2sw_build"
+   [ -d ./dist/x2swbin ] && rm -Rf ./dist/x2swbin
+   [ -d ./dist/x2sw ] && rm -Rf ./dist/x2sw
    "$PATH_TO_PYINSTALLER" ./x2sw.spec
    # new pyinstaller skips x2sw folder
-   if [ ! -d ./dist/x2sw ] && [ -d ./dist/x2swbin ]; then
-     mkdir ./dist/x2sw
+   if [ -d ./dist/x2swbin ]; then
+     mkdir -p ./dist/x2sw
      mv ./dist/x2swbin ./dist/x2sw/
    fi
    ln -s bin/slic3r ./dist/x2sw/x2swbin/slic3r/slic3r
@@ -96,10 +98,11 @@ if [[ ! $* =~ (^| )7($| ) ]]; then
    mkdir -p ./pango/modules
    echo "[Pango]" > ./pango/pangorc
    echo "ModuleFiles = ./pango/pango.modules" >> ./pango/pangorc
-   pango-querymodules | sed -e "s/.*\/\([^\/][^\/]*\.so\)\s\(.*\)/\.\/pango\/modules\/\1 \2/" > ./pango/pango.modules
-   for f in `pango-querymodules | sed -e "s/\s*\([^#].*\.so\) .*/\1/"  | grep -Ev "\s*#"`; do
-      cp -f $f ./pango/modules/
-   done
+   touch ./pango/pango.modules
+   #pango-querymodules | sed -e "s/.*\/\([^\/][^\/]*\.so\)\s\(.*\)/\.\/pango\/modules\/\1 \2/" > ./pango/pango.modules
+   #for f in `pango-querymodules | sed -e "s/\s*\([^#].*\.so\) .*/\1/"  | grep -Ev "\s*#"`; do
+   #   cp -f $f ./pango/modules/
+   #done
 fi
 
 echo Adding submodule information to the version file
