@@ -46,6 +46,10 @@ if sys.platform.startswith('win'):
     binTreeName = 'dist/x2swbin'
 elif sys.platform.startswith('linux'):
     pfaceExeName = 'dist/pronterface'
+    usrLibPath = '/usr/lib/i386-linux-gnu'
+    if not os.path.exists(usrLibPath):
+        usrLibPath = '/usr/lib'
+    libPath = '/usr/lib/python' + python2dVersion
     tclTree1 = Tree(os.path.join('/usr/share', 'tcltk', 'tcl8.5'), prefix='lib/tcl')
     tclTree2 = Tree(os.path.join('/usr/share', 'tcltk', 'tk8.5'), prefix='lib/tk')
     slic3rDll = Tree('../slic3r_linux/release/slic3r/dll', 'slic3r/dll')
@@ -54,21 +58,24 @@ elif sys.platform.startswith('linux'):
     slic3rRes = Tree('../slic3r/var', 'slic3r/bin/var')
     slic3rExe = '../slic3r_linux/release/slic3r/bin/slic3r'
     slic3rBin = [(os.path.join('slic3r', 'bin', os.path.basename(slic3rExe)), slic3rExe, 'BINARY')]
-    driversDir = []
-    libPath = '/usr/lib/python' + python2dVersion
+    driversDir = Tree(os.path.join(usrLibPath, 'gtk-2.0'), 'lib/gtk-2.0')
     dlls = []
-    manualPLibs = [libPath + '/lib-dynload/_tkinter.so', libPath + '/lib-dynload/datetime.so', libPath + '/lib-dynload/cmath.so', '/usr/lib/mesa/libGL.so.1', '/usr/lib/libglut.so.3']
-    manualBLibs = ['/usr/lib/mesa/libGL.so.1', '/usr/lib/libglut.so.3', '/usr/lib/i386-linux-gnu/mesa/libGL.so.1', '/usr/lib/i386-linux-gnu/libglut.so.3']
-    for lib in manualPLibs:
-        if not os.path.exists(lib):
+    # flag bits 0-include dependencies, 1-optional, 2-put under bindir
+    manualLibs = [(libPath + '/lib-dynload/_tkinter.so', 1),
+                  (libPath + '/lib-dynload/datetime.so', 1),
+                  (libPath + '/lib-dynload/cmath.so', 3),
+                  (usrLibPath + '/mesa/libGL.so.1', 4), 
+                  (usrLibPath + '/libglut.so.3', 4)]
+    for (lib, flag) in manualLibs:
+        if ((flag & 2) != 0) and (not os.path.exists(lib)):
             continue
-        for (t1, t2) in PyInstaller.bindepend.selectImports(lib):
-            dlls.append((os.path.join('lib',t1), t2, 'DATA'))
-        dlls.append((os.path.join('lib', os.path.basename(lib)), lib, 'DATA'))
-    for lib in manualBLibs:
-        if not os.path.exists(lib):
-            continue
-        dlls.append((os.path.basename(lib), lib, 'DATA'))
+        dstPrefix = 'lib/'
+        if ((flag & 4) != 0):
+            dstPrefix = ''
+        if (flag & 1) != 0:
+            for (t1, t2) in PyInstaller.bindepend.selectImports(lib):
+                dlls.append((dstPrefix + t1, t2, 'DATA'))
+        dlls.append((dstPrefix + os.path.basename(lib), lib, 'DATA'))
     # Add TCL/TK deps
     #import imp
     #tkhook = imp.find_module("PyInstaller/hooks/hook-_tkinter")
