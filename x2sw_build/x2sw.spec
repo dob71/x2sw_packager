@@ -65,8 +65,9 @@ elif sys.platform.startswith('linux'):
                   (libPath + '/lib-dynload/datetime.so', 1),
                   (libPath + '/lib-dynload/cmath.so', 3),
                   ('/tmp/pango_fc_mod.so', 5), 
-                  (usrLibPath + '/mesa/libGL.so.1', 4), 
-                  (usrLibPath + '/libglut.so.3', 4)]
+                  ('/tmp/P/site/lib/auto/OpenGL/OpenGL.so', 5), 
+                  (usrLibPath + '/mesa/libGL.so.1', 5), 
+                  (usrLibPath + '/libglut.so.3', 5)]
     for (lib, flag) in manualLibs:
         if ((flag & 2) != 0) and (not os.path.exists(lib)):
             continue
