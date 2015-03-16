@@ -14,6 +14,9 @@ fi
 
 if [ "$PATH_TO_PYINSTALLER" == "" ]; then
   PATH_TO_PYINSTALLER=/usr/local/bin/pyinstaller
+  if [ -d "$PATH_TO_PYINSTALLER" ]; then
+    PATH_TO_PYINSTALLER=/usr/local/bin/pyinstaller/pyinstaller.py
+  fi
 fi
 
 # error handling
@@ -52,7 +55,16 @@ fi
 # Step 4, build slic3r binary package
 if [[ ! $* =~ (^| )4($| ) ]]; then 
    echo "Starting the slic3r binaries build."
-   $PATH_TO_CAVACONSOLE/cavaconsole -S -B --project /tmp/S/slic3r_linux
+   while [ 1 ]; do 
+     if $PATH_TO_CAVACONSOLE/cavaconsole -S -B --project /tmp/S/slic3r_linux
+     then
+       break
+     else
+       echo "Cava packager has failed. Use GUI to fix the project file."
+       echo "If this is the first run set scripts path to /tmp/S/slic3r"
+       $PATH_TO_CAVACONSOLE/cavapackager --project /tmp/S/slic3r_linux
+     fi
+   done
 fi
 
 # Step 5, pre-compile python code
@@ -68,21 +80,34 @@ fi
 if [[ ! $* =~ (^| )6($| ) ]]; then 
    echo "Building x2sw binary distribution."
    cd "$X2SW_PROJ_DIR/x2sw_build"
-   "$PATH_TO_PYINSTALLER/pyinstaller.py" ./x2sw.spec
-   ln -s bin/slic3r dist/x2sw/x2swbin/slic3r/slic3r
+   [ -d ./dist/x2swbin ] && rm -Rf ./dist/x2swbin
+   [ -d ./dist/x2sw ] && rm -Rf ./dist/x2sw
+   # prepare pango module for pyinstaller
+   cp `/usr/bin/pango-querymodules | grep BasicScriptEngineFc | sed -e 's/ .*//'` /tmp/pango_fc_mod.so
+   # run pyinstaller
+   "$PATH_TO_PYINSTALLER" ./x2sw.spec
+   # new pyinstaller skips x2sw folder
+   if [ -d ./dist/x2swbin ]; then
+     mkdir -p ./dist/x2sw
+     mv ./dist/x2swbin ./dist/x2sw/
+   fi
+   cp ./slic3r ./dist/x2sw/x2swbin/slic3r/slic3r
 fi
 
 # Step 7, add Pango modules ang configuration files
 if [[ ! $* =~ (^| )7($| ) ]]; then 
    echo "Adding Pango."
    cd "$X2SW_PROJ_DIR/x2sw_build/dist/x2sw/x2swbin"
-   mkdir -p ./pango/modules
-   echo "[Pango]" > ./pango/pangorc
-   echo "ModuleFiles = ./pango/pango.modules" >> ./pango/pangorc
-   pango-querymodules | sed -e "s/.*\/\([^\/][^\/]*\.so\)\s\(.*\)/\.\/pango\/modules\/\1 \2/" > ./pango/pango.modules
-   for f in `pango-querymodules | sed -e "s/\s*\([^#].*\.so\) .*/\1/"  | grep -Ev "\s*#"`; do
-      cp -f $f ./pango/modules/
-   done
+   /usr/bin/pango-querymodules pango_fc_mod.so | sed -e 's/^.*pango_fc_mod.so/pango_fc_mod.so/' > pango.modules
+   echo "[Pango]" > pangorc
+   echo "ModuleFiles=pango.modules" >> pangorc
+   #pango-querymodules | sed -e "s/.*\/\([^\/][^\/]*\.so\)\s\(.*\)/\.\/pango\/modules\/\1 \2/" > ./pango/pango.modules
+   #mkdir -p ./pango/modules
+   #touch ./pango/pango.modules
+   #pango-querymodules | sed -e "s/.*\/\([^\/][^\/]*\.so\)\s\(.*\)/\.\/pango\/modules\/\1 \2/" > ./pango/pango.modules
+   #for f in `pango-querymodules | sed -e "s/\s*\([^#].*\.so\) .*/\1/"  | grep -Ev "\s*#"`; do
+   #   cp -f $f ./pango/modules/
+   #done
 fi
 
 echo Adding submodule information to the version file
