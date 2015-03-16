@@ -66,6 +66,7 @@ elif sys.platform.startswith('linux'):
                   (libPath + '/lib-dynload/cmath.so', 3),
                   ('/tmp/pango_fc_mod.so', 5), 
                   ('/tmp/P/site/lib/auto/OpenGL/OpenGL.so', 5), 
+                  ('/tmp/P/site/lib/auto/Wx/Wx.so', 5), 
                   (usrLibPath + '/mesa/libGL.so.1', 5), 
                   (usrLibPath + '/libglut.so.3', 5)]
     for (lib, flag) in manualLibs:
