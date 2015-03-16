@@ -4,6 +4,7 @@ unset CMD
 PRE_CWD=`pwd`
 cd `dirname $0`/x2swbin
 BINDIR=`pwd`
+
 export PATH=$BINDIR:$BINDIR/lib:$PATH
 export GTK_MODULES=
 export GTK2_MODULES=
@@ -11,7 +12,7 @@ export GTK_PATH=$BINDIR:$BINDIR/lib
 export GTK_EXE_PREFIX=$BINDIR
 
 # Pango modules are bundled (for fonts rendering), have to use custom RC that points to them
-export PANGO_RC_FILE=./pango/pangorc
+export PANGO_RC_FILE=pangorc
 
 PREFIX=nohup
 SUFFIX='</dev/null 2>/dev/null 1>&2 &'

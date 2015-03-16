@@ -64,6 +64,7 @@ elif sys.platform.startswith('linux'):
     manualLibs = [(libPath + '/lib-dynload/_tkinter.so', 1),
                   (libPath + '/lib-dynload/datetime.so', 1),
                   (libPath + '/lib-dynload/cmath.so', 3),
+                  ('/tmp/pango_fc_mod.so', 5), 
                   (usrLibPath + '/mesa/libGL.so.1', 4), 
                   (usrLibPath + '/libglut.so.3', 4)]
     for (lib, flag) in manualLibs:
