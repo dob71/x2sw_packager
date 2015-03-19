@@ -27,6 +27,10 @@ Notes:
 
 * Cloning
 ```
+- Make sure you have a github account, SSH setup, keys etc. 
+  You should be able to clone using git protocol (i.e. from 
+  git@github.com:... remotes) or you'll need to change origin urls for
+  slic3r and x2swn submodules to HTTPS ones
 - After runing "git clone" do "git submodule init" and "git submodule update"
   to populate submodule folders
 ```
@@ -42,19 +46,25 @@ Notes:
   . ~/CitrusPerl/bin/citrusvars.sh
 - install "cpanm" (if don't have curl yet, "sudo apt-get install curl" first)
   curl -L http://cpanmin.us | perl - --sudo App::cpanminus
+- "sudo chown -R user:group ~/CitrusPerl" - recursively chown to your user:group
+- sudo apt-get install g++
 - Go to "x2sw_packager/slic3r" folder and install/build dependencies: 
   perl Build.PL --install
+  It will fail (at least for some packages listed below)
 - Force-install Test:Harness (for now it has one useless test that always fails)
   cpanm --force Test::Harness
 - Install a few other dependencies manually:
   sudo apt-get install libexpat1 libexpat1-dev
   cpanm XML::SAX::ExpatXS --configure-args EXPATLIBPATH=/usr/lib/i386-linux-gnu
+- You can try perl "perl Build.PL --install" again to make sure everything is 
+  installed now
 - Install freeglut, webkitgtk, and a few more GUI dependencies:
   sudo apt-get install libwebkitgtk-1.0
   sudo apt-get install freeglut3 freeglut3-dev
   sudo apt-get install libxi-dev libxmu-dev
 - Create symlink (OpenGL v0.6704 Makefile.PL fails to find freeglut without
   it, you can remove the symlink after it is installed):
+  sudo mkdir /usr/local/freeglut
   sudo ln -s /usr/lib/i386-linux-gnu /usr/local/freeglut/lib
 - Go to "x2sw_packager/slic3r" folder and install/build GUI dependencies.
   This will most certainly fail (never happened to "just work" for me), but 
@@ -63,6 +73,8 @@ Notes:
   perl Build.PL --install --gui
    If the above command succeedes you are done, otherwise:
   perl Build.PL --install --wx
+   If the above fails at Wx test step (like under 14.04.02), try to force:
+  cpanm --force ./local_packages/Wx-0.9923.tar.gz
 ```
 * Building Printrun (Ubuntu 12.04, 32bit)
 ```
@@ -96,23 +108,26 @@ Notes:
   cd ..
 - Install CavaPackager. It has GUI installer. When GUI pops up, change install 
   path to just "/home/<your_username>". It creates CavaPackager folder there...
+   cd /tmp
    wget http://www.cavapackager.com/download/release-2.0.81/cava-packager-linux-x86-2-0-81
    chmod a+x ./cava-packager-linux-x86-2-0-81
    ./cava-packager-linux-x86-2-0-81
-   cd <back_to_x2sw_packager_repository>
 - Install Pyinstaller:
    cd /tmp
    wget https://pypi.python.org/packages/source/P/PyInstaller/PyInstaller-2.1.tar.gz
    tar -xzvf PyInstaller-2.1.tar.gz 
    cd PyInstaller-2.1/
    sudo python setup.py install
+   cd <back_to_x2sw_packager_repository>
+- Install pango dev package:
+   sudo apt-get install libpango1.0-dev
 - Clean up the repository:
-  git clean -xdf
+   git clean -xdf
 - Run the build script:
-  ./buildall.sh
+   ./buildall.sh
 - First time you run the build script CavaPackager GUI should pop up and 
-  complain about finding slic3r.pl script file. You'll need to fix the 
-  CavaPackager project (alas its portability mechanism is a bit of PITA
+  complain about not finding slic3r.pl script file. You'll need to fix the 
+  CavaPackager project (alas its portability mechanism is a bit of PITA,
   see http://www.cavapackager.com/appdocs/topicoverview-portability.htm).
   1. Click on "scripts" in the left pane, then click pencil icon in the right 
      pane top corner. Set the script path to /tmp/S/slic3r. 
