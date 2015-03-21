@@ -25,13 +25,13 @@ if [ "$TOSTART" == "console" ]; then
   SUFFIX=
 fi
 if [ "$TOSTART" == "" ]; then
-  TOSTART=pronterface.sh
+  TOSTART=pronterface
 fi
 OPTIONS=$*
 
 case $TOSTART in
   pronterface)
-    CMD="$PREFIX ./$TOSTART $OPTIONS $SUFFIX"
+    CMD="$PREFIX ./$TOSTART.sh $OPTIONS $SUFFIX"
     ;;
   slic3r)
     CMD="$PREFIX ./slic3r/$TOSTART $OPTIONS $SUFFIX"
