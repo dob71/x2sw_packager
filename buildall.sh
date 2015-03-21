@@ -130,6 +130,7 @@ if [[ ! $* =~ (^| )8($| ) ]]; then
    VER=`cat ./x2sw/version.txt`
    cd "$X2SW_PROJ_DIR/x2sw_build/dist"
    cp "$X2SW_PROJ_DIR/x2sw_build/x2start" ./x2sw/
+   cp "$X2SW_PROJ_DIR/x2sw_build/pronterface.sh" ./x2sw/x2swbin/
    # replace real python with a wrapper
    mv ./x2sw/x2swbin/python ./x2sw/x2swbin/pythonx
    cp "$X2SW_PROJ_DIR/x2sw_build/pywrapper" ./x2sw/x2swbin/python
