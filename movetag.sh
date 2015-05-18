@@ -15,9 +15,9 @@ if [ $? -ne 0 ]; then
   exit 2
 fi                            
 
-git tag -n100 -l $1 | sed -e "s~^\($THETAG\)\? *~~" > $MSGFILE
+git tag -n100 -l $THETAG | sed -e "s~^\($THETAG\)\? *~~" > $MSGFILE
 if [ $? -ne 0 ]; then
-  echo "Failed to retriev the tag '$THETAG' message."
+  echo "Failed to retrieve the tag '$THETAG' message."
   exit 3
 fi                            
 
