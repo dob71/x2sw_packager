@@ -1,5 +1,15 @@
 @echo off
 
+set SKIP1=
+set SKIP2=
+set SKIP3=
+set SKIP4=
+set SKIP5=
+set SKIP6=
+set SKIP7=
+set SKIP8=
+set SKIP9=
+
 set "X2SW_PROJ_DIR=%~dp0"
 if not defined PATH_TO_PERL_INSTALL set PATH_TO_PERL_INSTALL=D:\CitrusPerl
 if not defined PATH_TO_CAVACONSOLE set PATH_TO_CAVACONSOLE="C:\Program Files\Cava Packager 2.0\bin"
