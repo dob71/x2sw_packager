@@ -71,6 +71,7 @@ elif sys.platform.startswith('linux'):
                   (usrLibPath + '/libglut.so.3', 5)]
     for (lib, flag) in manualLibs:
         if ((flag & 2) != 0) and (not os.path.exists(lib)):
+            print 'Cannot find %s\n' % lib
             continue
         dstPrefix = 'lib/'
         if ((flag & 4) != 0):

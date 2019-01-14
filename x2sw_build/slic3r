@@ -1,11 +1,12 @@
 #!/bin/bash
 # Get rid of console output in GUI mode (GTK warnings)
 
-S3RDIR=`dirname $0`
+S3RDIR="${0%/*}"
 S3REXE="$S3RDIR/bin/slic3r"
 
+
 if [[ "$*" == *--gui* ]]; then
-  $S3REXE $* 1>/dev/null 2>/dev/null
+  LD_LIBRARY_PATH=$S3RDIR/dll:$LD_LIBRARY_PATH $S3REXE $* 1>/dev/null 2>/dev/null
 else
-  $S3REXE $*
+  LD_LIBRARY_PATH=$S3RDIR/dll:$LD_LIBRARY_PATH $S3REXE $*
 fi

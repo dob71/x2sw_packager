@@ -5,14 +5,10 @@ PRE_CWD=`pwd`
 cd `dirname $0`/x2swbin
 BINDIR=`pwd`
 
-export PATH=$BINDIR:$BINDIR/lib:$PATH
-export GTK_MODULES=
-export GTK2_MODULES=
-export GTK_PATH=$BINDIR:$BINDIR/lib
-export GTK_EXE_PREFIX=$BINDIR
-
-# Pango modules are bundled (for fonts rendering), have to use custom RC that points to them
-export PANGO_RC_FILE=pangorc
+# Get the loader and rpath the files are currently patched to use
+if [ -e "$BINDIR/.patchelf_vars" ]; then
+  . "$BINDIR/.patchelf_vars"
+fi
 
 PREFIX=nohup
 SUFFIX='</dev/null 2>/dev/null 1>&2 &'
@@ -29,6 +25,102 @@ if [ "$TOSTART" == "" ]; then
 fi
 OPTIONS=$*
 
+# Arguments: <file_where_to_add_results> <pgrep_pattern> <what_to_run> ...
+function collect_deps() {
+    local LIST_FILE="$1"
+    shift
+    local PGREP_PATTERN="$1"
+    shift
+    local APP_CMD="$*"
+    echo "Killing stale processees for $APP..."
+    local PID_LIST=`pgrep -f "$PGREP_PATTERN"`
+    if [ ! -z "$PID_LIST" ]; then
+      kill -9 $PID_LIST
+    fi
+    echo "Starting $APP_CMD..."
+    $APP_CMD &
+    local ii=30
+    while [ $ii -gt 0 ]; do
+      echo "Waiting for $APP_CMD $ii sec remains..."
+      sleep 1;
+      let 'ii--'
+      local PID_LIST=`pgrep -f "$PGREP_PATTERN"`
+      for PID in $PID_LIST; do
+        echo "Capturing loaded libs for pid $PID..."
+        cat /proc/$PID/maps | sed -e 's/^.* \(\/lib\|\/usr\/lib\)/\1/;t;d' | sort | uniq >> "$LIST_FILE"
+      done
+    done
+    echo "Killing the app..."
+    kill -9 $PID_LIST
+    wait $PID_LIST
+}
+
+# Loader and rpath we should use
+export MY_LOADER=$BINDIR/ld-linux.so.2
+export MY_RPATH=$BINDIR
+export MY_SHELL=$BINDIR/bash
+
+# Check the installation for being modified to use local loader and rpath
+# unless creating the dependencies list
+if [ "$TOSTART" != "deps" ]; then
+  # See if we need to patch the files
+  if [ "$MY_LOADER" != "$CUR_LOADER" ] || [ "$MY_RPATH" != "$CUR_RPATH" ]; then
+    for ff in `find "$BINDIR" -type f`; do
+      SCRIPT=`file "$ff" | grep -E 'shell script.* executable' | sed -e 's/: .*//'`;
+      if [ ! -z "$SCRIPT" ]; then
+         echo "Patching script $ff"
+         sed -e "s|^#!/.*|#!$MY_SHELL|" -i "$ff"
+      fi
+      EXEC=`file "$ff" | grep -E 'ELF.* dynamically linked' | sed -e 's/: .*//'`;
+      if [ -z $EXEC ]; then
+        continue
+      fi
+      # Some libs were added without read permission even for the owner
+      chmod u+w "$ff"
+      # Set rpath to point to our bindir pile of junk
+      OLDINT=$("$BINDIR/patchelf" --print-interpreter "$ff" 2>/dev/null)
+      OLDRPATH=$("$BINDIR/patchelf" --print-rpath "$ff" 2>/dev/null)
+      if [[ /$OLDRPATH == //lib/* ]] || [[ /$OLDRPATH == //usr/* ]] ; then
+        echo "Patching rpath in $ff"
+        "$BINDIR/patchelf" --set-rpath "$MY_RPATH" "$ff"
+      fi
+      # Set the loader
+      if [[ /$OLDINT == //lib/* ]]; then
+        echo "Patching interpreter in $ff"
+        "$BINDIR/patchelf" --set-interpreter "$MY_LOADER" "$ff"
+      fi
+    done
+    echo "CUR_LOADER=\"$MY_LOADER\"" > "$BINDIR/.patchelf_vars"
+    echo "CUR_RPATH=\"$MY_RPATH\"" >> "$BINDIR/.patchelf_vars"
+  fi
+fi
+
+if [ "$TOSTART" != "deps" ]; then
+  export PATH=$BINDIR:$BINDIR/lib
+  export GTK_MODULES=
+  export GTK2_MODULES=
+  export GTK_PATH=$BINDIR:$BINDIR/lib
+  export GTK_EXE_PREFIX=$BINDIR
+  export GTK_DATA_PREFIX=$BINDIR
+  export GDK_PIXBUF_MODULE_FILE=$BINDIR/gdk-pixbuf-2.0/2.10.0/loaders.cache
+  export GTK_IM_MODULE_FILE=$BINDIR/immodules.cache
+  export GIO_EXTRA_MODULES=$BINDIR/gio/modules
+  export LIBOVERLAY_SCROLLBAR=0
+
+  export LIBGL_DRIVERS_PATH=$BINDIR/dri:$BINDIR
+
+  export LOCPATH=$BINDIR/locale
+  export GCONV_PATH=$BINDIR/gconv
+
+  # Pango modules are bundled (for fonts rendering), have to use custom RC that points to them
+  export PANGO_RC_FILE=pangorc
+else
+  export PATH=$BINDIR:$BINDIR/lib:$PATH
+fi
+
+# for debugging dependencies
+#export LD_DEBUG=libs
+
 case $TOSTART in
   pronterface)
     CMD="$PREFIX ./$TOSTART.sh $OPTIONS $SUFFIX"
@@ -39,6 +131,23 @@ case $TOSTART in
   skeinforge)
     CMD="$PREFIX ./python ./skeinforge/skeinforge_application/skeinforge.py $OPTIONS $SUFFIX"
     ;;
+  deps)
+    if [ "$1" == "" ]; then
+      CMD=''
+      echo "Usage: ... deps <OUTPUT_FILE_NAME>"
+      exit 255
+    fi
+    OUT_FILE="$1"
+    LIST_FILE=/tmp/x2sw_$$.txt
+    rm -f "$LIST_FILE"
+    collect_deps "$LIST_FILE" "./pronterface" ./pronterface
+    collect_deps "$LIST_FILE" "skeinforge_application/skeinforge.py" ./python ./skeinforge/skeinforge_application/skeinforge.py
+    collect_deps "$LIST_FILE" "slic3r" ./slic3r/slic3r
+    "$BINDIR/patchelf" --print-interpreter ./pronterface > "$OUT_FILE"
+    cat "$LIST_FILE" | sort | uniq >> "$OUT_FILE"
+    echo "The dependencies are saved in $OUT_FILE"
+    exit 0
+    ;;
   *)
     SCRIPT_NAME=`basename $0`
     echo "Usage: $SCRIPT_NAME [console] [pronterface|slic3r|skeinforge] ..."
@@ -46,8 +155,12 @@ case $TOSTART in
     echo "If \"console\" is specified the console stays attached and the output is not supressed."
     echo "The options to pass to the specified subcommand application can be added at the end of the command line."
     echo "If run without paramaters \"pronterface\" is invoked."
+    exit 255
     ;;
 esac
+
+# Set library path to make sure our stuff has the priority
+export LD_LIBRARY_PATH=$BINDIR:$BINDIR/gvfs
 
 eval $CMD
 

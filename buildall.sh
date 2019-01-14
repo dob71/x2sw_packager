@@ -116,9 +116,69 @@ cd "$X2SW_PROJ_DIR"
 cp -f ./x2sw/version.txt x2sw_build/dist/x2sw/version.txt
 git submodule >> x2sw_build/dist/x2sw/version.txt
 
-# Step 8, building the binary package (first move the files around
+# Step 8, discovering and adding dependencies
+if [[ ! $* =~ (^| )8($| ) ]]; then
+   echo "Adding/fixing all the dependencies"
+   cd "$X2SW_PROJ_DIR/x2sw_build/dist/x2sw"
+   cp "$X2SW_PROJ_DIR/x2sw_build/x2start" ./
+   cp "$X2SW_PROJ_DIR/x2sw_build/pronterface.sh" ./x2swbin/
+   # replace real python with a wrapper
+   mv ./x2swbin/python ./x2swbin/pythonx
+   cp "$X2SW_PROJ_DIR/x2sw_build/pywrapper" ./x2swbin/python
+   # adding patchelf
+   echo "Adding precompiled statically linked patchelf"
+   cp "$X2SW_PROJ_DIR/x2sw_build/patchelf" "./x2swbin/"
+   # discover and add dependencies
+   DEPSFILE="/tmp/x2sw.deps"
+   if [ ! -e "$DEPSFILE" ]; then
+      echo "The dependencies list file $DEPSFILE is not found."
+      echo "You will need to generate dependencies list"
+      echo "rm -Rf /tmp/x2sw"
+      echo "cp -R \"$X2SW_PROJ_DIR/x2sw_build/dist/x2sw\" /tmp/"
+      echo "cd /tmp/x2sw"
+      echo "./x2start deps $DEPSFILE"
+      echo "You'll have 30sec to trigger each app to load all its librarieas..."
+      echo "rm -Rf /tmp/x2sw"
+      echo "Press Enter when the $DEPSFILE is ready..."
+      read
+   fi
+   echo "Adding the discovered dependencies"
+   for ff in `cat "$DEPSFILE" | grep -w so`; do
+      # copy over the library
+      SUBPATH=`echo "$ff" | sed -e 's/\(\/usr\/lib\/i386[^\/]*\/\|\/lib\/i386[^\/]*\/\|\/usr\/lib\/\|\/lib\/\)//'`
+      install -D "$ff" "$X2SW_PROJ_DIR/x2sw_build/dist/x2sw/x2swbin/$SUBPATH"
+      ls -l "$X2SW_PROJ_DIR/x2sw_build/dist/x2sw/x2swbin/$SUBPATH"
+      # Find and create symlinks to the library added
+      ORIGDIR=`dirname "$ff"`
+      ORIGNAME=`basename "$ff"`
+      for fff in `find "$ORIGDIR" -maxdepth 1 -type l`; do
+        if [[ /$(realpath $fff) == /$ff ]]; then
+          LINKNAME=`basename "$fff"`
+          LINKDIR=`dirname "$X2SW_PROJ_DIR/x2sw_build/dist/x2sw/x2swbin/$SUBPATH"`
+          ln -sf "$ORIGNAME" "$LINKDIR/$LINKNAME"
+        fi
+      done
+   done
+   echo "Dynamic loader:"
+   INTERPRETER=`./x2swbin/patchelf --print-interpreter ./x2swbin/pronterface`
+   ls -l "$INTERPRETER"
+   cp "$INTERPRETER" "$X2SW_PROJ_DIR/x2sw_build/dist/x2sw/x2swbin/"
+   echo "Dynamic linker library:"
+   REALINTERPRETER=`realpath "$INTERPRETER"`
+   LIBDLPATH=`dirname "$REALINTERPRETER"`
+   LIBDL="$LIBDLPATH/libdl.so.2"
+   # This should be symlink pointing to the libc libdl file in the same folder
+   ls -l "$LIBDL"
+   cp -d "$LIBDL" "$X2SW_PROJ_DIR/x2sw_build/dist/x2sw/x2swbin/"
+   # bash, helpers and their libs"
+   echo "Copying over bash, shell helpers and their libs"
+   cp /bin/bash "$X2SW_PROJ_DIR/x2sw_build/dist/x2sw/x2swbin/"
+   cp /usr/bin/nohup "$X2SW_PROJ_DIR/x2sw_build/dist/x2sw/x2swbin/"
+fi
+
+# Step 9, building the binary package (first move the files around
 # and create symlinks to make it look clean and simple).
-if [[ ! $* =~ (^| )8($| ) ]]; then 
+if [[ ! $* =~ (^| )9($| ) ]]; then 
    echo Building packages
    if [ ! -e "$X2SW_PROJ_DIR/out" ]; then 
       mkdir "$X2SW_PROJ_DIR/out"
@@ -127,14 +187,9 @@ if [[ ! $* =~ (^| )8($| ) ]]; then
       rm -Rf "$X2SW_PROJ_DIR/out/linux"
    fi
    mkdir "$X2SW_PROJ_DIR/out/linux"
-   VER=`cat ./x2sw/version.txt`
-   cd "$X2SW_PROJ_DIR/x2sw_build/dist"
-   cp "$X2SW_PROJ_DIR/x2sw_build/x2start" ./x2sw/
-   cp "$X2SW_PROJ_DIR/x2sw_build/pronterface.sh" ./x2sw/x2swbin/
-   # replace real python with a wrapper
-   mv ./x2sw/x2swbin/python ./x2sw/x2swbin/pythonx
-   cp "$X2SW_PROJ_DIR/x2sw_build/pywrapper" ./x2sw/x2swbin/python
+   VER=`cat "$X2SW_PROJ_DIR/x2sw/version.txt"`
    # make the tarball
+   cd "$X2SW_PROJ_DIR/x2sw_build/dist"
    tar -czvf "$X2SW_PROJ_DIR/out/linux/x2sw_$VER.tgz" x2sw
 fi
 
